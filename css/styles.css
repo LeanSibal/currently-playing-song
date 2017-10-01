@@ -1,0 +1,25 @@
+.currently_playing_song {
+    height:80px;
+    width: 100%;
+    display:flex;
+    flex-direction:row;
+    align-items: center;
+}
+.currently_playing_song .icon-microphone{
+    background-color:rgb( 68, 68, 68 );
+    width:80px;
+    height:80px;
+}
+.currently_playing_song #currently_playing {
+    align-items: center;
+    height:100%;
+    background-color:rgb( 4, 147, 202 );
+    display:table;
+}
+.currently_playing_song #currently_playing span {
+    display:table-cell;
+    vertical-align:middle;
+    margin:0;
+    padding:5px 20px;
+    color: rgb( 243, 251, 254 );
+}
