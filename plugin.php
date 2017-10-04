@@ -14,8 +14,8 @@ function currently_playing_song_shortcode( $atts ) {
     ob_start();
 ?>
 <div class="currently_playing_song">
-    <div class="icon-microphone"></div>
-    <div id="currently_playing"><span></span></div>
+    <div><span id="currently_playing"></span></div>
+    <div><span id="playing_last"></span></div>
 </div>
 <?php
     return ob_get_clean();
