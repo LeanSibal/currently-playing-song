@@ -14,8 +14,11 @@ function currently_playing_song_shortcode( $atts ) {
     ob_start();
 ?>
 <div class="currently_playing_song">
-    <div><span id="currently_playing"></span></div>
-    <div><span id="playing_last"></span></div>
+    <?php if( !empty( $atts['show'] ) && $atts['show'] == 'current' ) : ?>
+        <div><span id="currently_playing"></span></div>
+    <?php elseif ( !empty( $atts['show'] ) && $atts['show'] == 'last' ) : ?>
+        <div><span id="last_played"></span></div>
+    <?php endif; ?>
 </div>
 <?php
     return ob_get_clean();

@@ -18,7 +18,7 @@ jQuery( document ).ready(function($){
                 }
                 if( typeof currentSong.title !== 'undefined' && typeof currentSong.artist !== 'undefined' ) {
                     $("#currently_playing").text( currentSong.artist + ": " + currentSong.title );
-                    $("#playing_last").text( playingLast.artist + ": " + playingLast.title );
+                    $("#last_played").text( playingLast.artist + ": " + playingLast.title );
                 }
             }
         );
