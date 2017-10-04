@@ -13,13 +13,11 @@ function currently_playing_song_shortcode( $atts ) {
     wp_enqueue_style( 'song_styles' );
     ob_start();
 ?>
-<div class="currently_playing_song">
-    <?php if( !empty( $atts['show'] ) && $atts['show'] == 'current' ) : ?>
-        <div><span id="currently_playing"></span></div>
-    <?php elseif ( !empty( $atts['show'] ) && $atts['show'] == 'last' ) : ?>
-        <div><span id="last_played"></span></div>
-    <?php endif; ?>
-</div>
+<?php if( !empty( $atts['show'] ) && $atts['show'] == 'current' ) : ?>
+    <span id="currently_playing"></span>
+<?php elseif ( !empty( $atts['show'] ) && $atts['show'] == 'last' ) : ?>
+    <span id="last_played"></span>
+<?php endif; ?>
 <?php
     return ob_get_clean();
 }
