@@ -17,8 +17,8 @@ jQuery( document ).ready(function($){
                     }
                 }
                 if( typeof currentSong.title !== 'undefined' && typeof currentSong.artist !== 'undefined' ) {
-                    $("#currently_playing").text( currentSong.artist + ": " + currentSong.title );
-                    $("#last_played").text( playingLast.artist + ": " + playingLast.title );
+                    $("#currently_playing").html( currentSong.artist + ": " + currentSong.title );
+                    $("#last_played").html( playingLast.artist + ": " + playingLast.title );
                 }
             }
         );
