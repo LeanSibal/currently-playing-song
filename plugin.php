@@ -40,15 +40,16 @@ function songs_playlist_shortcode( $atts ) {
             <option value="Saturday">Lørdag</option>
         </select>
         <select id="songTime">
-            <option value="1">kl. 00-01</option>
-            <option value="2">kl. 01-02</option>
-            <option value="3">kl. 02-03</option>
-            <option value="4">kl. 03-04</option>
-            <option value="5">kl. 04-05</option>
-            <option value="6">kl. 05-06</option>
-            <option value="7">kl. 06-07</option>
-            <option value="8">kl. 07-08</option>
-            <option value="9">kl. 08-09</option>
+            <option value="24">kl. 00-01</option>
+            <option value="1">kl. 01-02</option>
+            <option value="2">kl. 02-03</option>
+            <option value="3">kl. 03-04</option>
+            <option value="4">kl. 04-05</option>
+            <option value="5">kl. 05-06</option>
+            <option value="6">kl. 06-07</option>
+            <option value="7">kl. 07-08</option>
+            <option value="8">kl. 08-09</option>
+            <option value="9">kl. 09-10</option>
             <option value="10">kl. 10-11</option>
             <option value="11">kl. 11-12</option>
             <option value="12">kl. 12-13</option>
@@ -63,7 +64,6 @@ function songs_playlist_shortcode( $atts ) {
             <option value="21">kl. 21-22</option>
             <option value="22">kl. 22-23</option>
             <option value="23">kl. 23-24</option>
-            <option value="24">kl. 24-00</option>
         </select>
     </div>
     <div >

@@ -55,20 +55,23 @@ jQuery( document ).ready(function($){
                     var artist = songs[i].artist;
                     var title = songs[i].title;
                     fetchItunesAlbumArt( artist, title, songs[i], function( song, albumart ) {
+                        var link = '#'
                         if( albumart.resultCount > 0 ) {
-                            addSongToPlaylist({
-                                artist: song.artist,
-                                title: song.title,
-                                time: song.time,
-                                albumArt: albumart.results[0].artworkUrl100
-                            });
+                            link = albumart.results[0].artworkUrl100;
                         }
+                        addSongToPlaylist({
+                            artist: song.artist,
+                            title: song.title,
+                            time: song.time,
+                            albumArt: link
+                        });
                     } );
                 }
             });
         }
         updatePlaylist();
-        jQuery('#songDate,#songTime').change( updatePlaylist );
+        jQuery('#songDate').change( updatePlaylist );
+        jQuery('#songTime').change( updatePlaylist );
     }
 
 
