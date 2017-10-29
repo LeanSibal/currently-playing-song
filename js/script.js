@@ -42,6 +42,63 @@ function layoutSongTable( playlist ) {
     `;
     jQuery('#songs-playlist').html( playlist.map( tableRow ).join('') );
 }
+var currentlyPlaying = {
+    currentTime: null,
+    currentDay: null,
+    deductor: 0,
+    init: function(){
+        this.currentDay = moment.tz("Europe/Copenhagen").format('dddd');
+        this.currentTime = moment.tz("Europe/Copenhagen").format('H');
+        this.getCurrentSong();
+    },
+    getCurrentSong: function(){
+        this.getSongByDateAndTime( this.currentDay, this.currentTime );
+    },
+    getSongByDateAndTime: function( day, time ){
+        jQuery.getJSON('https://radiostreaming.dk/radioapp/app/?action=playlists&radio_id=34&station=default&day=' + day + '&time=' + time, 
+            function( song ) {
+                if( typeof song[0] !== 'undefined' && typeof song[0].title !== 'undefined' && song[0].title.length == 0 ) {
+                    this.deductor++;
+                    this.currentDay = moment.tz("Europe/Copenhagen").subtract( this.deductor, "hour").format('dddd');
+                    this.currentTime = moment.tz("Europe/Copenhagen").subtract( this.deductor, "hour").format('H');
+                    this.getSongByDateAndTime( this.currentDay, this.currentTime );
+                } else if( typeof song[0] !== 'undefined' && typeof song[0].title !== 'undefined' && song[0].title.length > 0 ) {
+                    this.setSong( song );
+                }
+            }.bind( this )
+        );
+    },
+    setSong: function( song ) {
+        song = song.filter( function( song ){
+            var date = moment.tz( ( moment( song.date + ' ' + song.time, 'YYMMDD HH:mm').format('YYYY-MM-DD HH:mm') ), "Europe/Copenhagen" ).unix();
+            var currentDate = moment.tz("Europe/Copenhagen").unix();
+            song.offset = currentDate - date;
+            if( song.offset > 0 ) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+        song = song.sort( function( a, b ) {
+            if( a.offset < b.offset ) {
+                return -1
+            } else if ( a.offset > b.offset ) {
+                return 1
+            } else {
+                return 0;
+            }
+        });
+        this.setCurrentlyPlaying( song[0] );
+        this.setLastPlayed( song[1] );
+    },
+    setCurrentlyPlaying: function( song ) {
+        jQuery('#currently_playing').html( song.artist + ": " + song.title );
+    },
+    setLastPlayed: function( song ) {
+        jQuery("#last_played").html( song.artist + ": " + song.title );
+    }
+
+};
 jQuery( document ).ready(function($){
     if( jQuery('.playlist').length > 0 ) {
         jQuery('#songDate').val( moment.tz("Europe/Copenhagen").format('dddd') );
@@ -73,34 +130,8 @@ jQuery( document ).ready(function($){
         jQuery('#songDate').change( updatePlaylist );
         jQuery('#songTime').change( updatePlaylist );
     }
-
-
-    if( $('#currently_playing').length > 0 ) {
-        var fetchSongs = function() {
-            var day = moment.utc().format("dddd");
-            $.getJSON('https://radiostreaming.dk/radioapp/app/?action=playlists&radio_id=34&station=default', 
-                function( songs ){
-                    console.log( songs );
-                    if( songs.length < 1 ) return false;
-                    var currentTime = 0;
-                    var currentSong = null;
-                    var playingLast = null;
-                    for( i in songs ) {
-                        var date = moment( songs[i].date + ' ' + songs[i].time + ' +01', 'YYMMDD HH:mm +-HH').valueOf();
-                        if( date > currentTime ){
-                            currentTime = date;
-                            playingLast = currentSong;
-                            currentSong = songs[i];
-                        }
-                    }
-                    if( typeof currentSong.title !== 'undefined' && typeof currentSong.artist !== 'undefined' ) {
-                        $("#currently_playing").html( currentSong.artist + ": " + currentSong.title );
-                        $("#last_played").html( playingLast.artist + ": " + playingLast.title );
-                    }
-                }
-            );
-        };
-        fetchSongs();
-        setTimeout(fetchSongs, 30000);
+    if( ( $('#currently_playing').length > 0 || $('#last_played').length > 0 ) && typeof currentlyPlaying !== 'undefined' ) {
+        currentlyPlaying.init();
     }
 });
+
