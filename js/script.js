@@ -1,14 +1,43 @@
 moment.tz.add(["Europe/Copenhagen|CET CEST|-10 -20|0101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010|-2azC0 Tz0 VuO0 60q0 WM0 1fA0 1cM0 1cM0 1cM0 S00 1HA0 Nc0 1C00 Dc0 1Nc0 Ao0 1h5A0 1a00 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1fA0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1fA0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1fA0 1o00 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00|12e5"]);
 var allSongs = [];
 function fetchSongsByDate( day, time, callback ) {
-    jQuery.getJSON('https://radiostreaming.dk/radioapp/app/?action=playlists&radio_id=34&station=default&day=' + day + '&time=' + time , callback );
+    jQuery.getJSON('http://radio-playlists.jfmedier.dk/playlist/json?station=classic&day=' + day + '&time=' + time , callback );
 }
 function fetchItunesAlbumArt( artist, title, song, callback ) {
-        jQuery.getJSON('http://itunes.apple.com/search?entity=song&limit=1&term=' + artist, 
-            function( albumart ) {
-                callback( song, albumart );
-            }
-        );
+	trySongAndArtist( song, callback ); 
+}
+function trySongAndArtist( song, callback ) {
+	jQuery.getJSON('http://itunes.apple.com/search?entity=song&limit=1&term=' + song.artist + '%20-%20' + song.title,
+		function ( albumart ) {
+			if( albumart.resultCount > 0 ) {
+				callback( song, albumart );
+			} else {
+				trySongAndCountry( song, callback );
+			}
+		}
+	);
+}
+
+function trySongAndCountry( song, callback ) {
+	jQuery.getJSON('http://itunes.apple.com/search?entity=song&limit=1&country=dk&term=' + song.title,
+		function ( albumart ) {
+			if( albumart.resultCount > 0 ) {
+				callback( song, albumart );
+			} else {
+				tryArtist( song, callback );
+			}
+		}
+	);
+}
+function tryArtist( song, callback ) {
+	jQuery.getJSON('http://itunes.apple.com/search?entity=song&limit=1&term=' + song.title,
+		function ( albumart ) {
+			if( albumart.resultCount > 0 ) {
+				callback( song, albumart );
+			} else {
+			}
+		}
+	);
 }
 var playlist = [];
 function addSongToPlaylist( song ) {
@@ -55,7 +84,7 @@ var currentlyPlaying = {
         this.getSongByDateAndTime( this.currentDay, this.currentTime );
     },
     getSongByDateAndTime: function( day, time ){
-        jQuery.getJSON('https://radiostreaming.dk/radioapp/app/?action=playlists&radio_id=34&station=default&day=' + day + '&time=' + time, 
+        jQuery.getJSON('http://radio-playlists.jfmedier.dk/playlist/json?station=classic&day=' + day + '&time=' + time, 
             function( song ) {
                 if( typeof song[0] !== 'undefined' && typeof song[0].title !== 'undefined' && song[0].title.length == 0 ) {
                     this.deductor++;
@@ -99,6 +128,17 @@ var currentlyPlaying = {
     }
 
 };
+function fixChars( text ) {
+	var replacements = {
+		'Ã¸' : 'ø',
+		'Ã¶' : 'ö',
+		'Ã¥' : 'å'
+	}
+	for( var i in replacements ) {
+		text = text.replace(i, replacements[i] );
+	}
+	return text;
+}
 jQuery( document ).ready(function($){
     if( jQuery('.playlist').length > 0 ) {
         jQuery('#songDate').val( moment.tz("Europe/Copenhagen").format('dddd') );
@@ -109,9 +149,9 @@ jQuery( document ).ready(function($){
             var hour = jQuery('#songTime').val();
             fetchSongsByDate( day, hour, function( songs ) {
                 for( var i in songs ) {
-                    var artist = songs[i].artist;
-                    var title = songs[i].title;
-                    fetchItunesAlbumArt( artist, title, songs[i], function( song, albumart ) {
+					songs[i].artist = fixChars( songs[i].artist );
+					songs[i].title = fixChars( songs[i].title );
+                    fetchItunesAlbumArt( songs[i].artist, songs[i].title, songs[i], function( song, albumart ) {
                         var link = '#'
                         if( albumart.resultCount > 0 ) {
                             link = albumart.results[0].artworkUrl100;
